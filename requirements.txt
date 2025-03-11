@@ -175,8 +175,8 @@ notebook_shim==0.2.4
 numpy==1.26.4
 omegaconf==2.3.0
 openai==0.28.0
-opencv-contrib-python==4.10.0.84
-opencv-python==4.10.0.84
+opencv-contrib-python==4.9.0.80
+opencv-python
 opencv-python-headless==4.10.0.84
 opt-einsum==3.3.0
 optree==0.10.0
