@@ -8,12 +8,16 @@ from ultralytics import YOLO  # YOLOv8
 app = Flask(__name__)
 CORS(app)  # ✅ Enable CORS for all routes
 
-# Configure Upload Folder
-UPLOAD_FOLDER = "results"
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+# Configure Upload and Results Folders
+UPLOAD_FOLDER = "uploads"  # Change this to 'uploads'
+RESULTS_FOLDER = "results"  # Use 'results' for processed images
+
+# Ensure folders exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(RESULTS_FOLDER, exist_ok=True)
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["RESULTS_FOLDER"] = RESULTS_FOLDER
 
 # ✅ Load YOLO model
 MODEL_PATH = "weights.pt"
@@ -41,19 +45,20 @@ def upload_file():
     gender = request.form.get("gender", "unknown")
 
     filename = f"{name}_{age}_{gender}.png"
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    upload_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
 
     # Save the original image to "uploads"
-    file.save(filepath)
+    file.save(upload_path)
 
     # Process image using YOLO model and save to "results"
-    result_path = os.path.join(app.config["UPLOAD_FOLDER"], f"processed_{filename}")
-    process_image(filepath, result_path)  # Process image with YOLO
+    result_filename = f"processed_{filename}"
+    result_path = os.path.join(app.config["RESULTS_FOLDER"], result_filename)
+    process_image(upload_path, result_path)  # Process image with YOLO
 
     return jsonify({
         "message": "Upload successful, image processed",
         "saved_as": filename,
-        "processed_as": f"processed_{filename}"
+        "processed_as": result_filename
     })
 
 # =======================
@@ -61,7 +66,7 @@ def upload_file():
 # =======================
 @app.route("/results/<filename>")
 def get_file(filename):
-    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+    return send_from_directory(app.config["RESULTS_FOLDER"], filename)
 
 # =======================
 # 📌 Health Check Route
