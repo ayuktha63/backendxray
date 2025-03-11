@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS  # Import CORS
 import os
 
 app = Flask(__name__)
+CORS(app)  # ✅ Enable CORS for all routes
 
 # Configure Upload Folder
 UPLOAD_FOLDER = "results"
@@ -43,6 +45,7 @@ def get_file(filename):
 @app.route("/")
 def home():
     return jsonify({"status": "Backend is running!"})
+
 
 # =======================
 # 📌 Run Flask App
